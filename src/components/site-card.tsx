@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
+import { LoaderIcon, OfflineIcon, OnlineIcon } from './icons';
 
 interface SiteCardProps {
   site_name: string;
@@ -10,6 +10,21 @@ interface SiteCardProps {
 }
 
 const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url }) => {
+ 
+
+  return (
+    <>
+      <div className="w-full flex flex-col gap-3 p-4 bg-greylight text-white rounded-lg shadow-sm">
+        <div>
+          <strong>{site_name}</strong>
+        </div>
+        <HealthChecker site_url={site_url}/>
+      </div>
+    </>
+  );
+};
+
+const HealthChecker = ({site_url}: {site_url: string}) => {
   const [status, setStatus] = useState('Checking...');
 
   // Function to check the health of the server
@@ -26,8 +41,6 @@ const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url }) => {
     }
   };
 
-  // Function to check the pipeline status
-
   // useEffect to check health and deployment status
   useEffect(() => {
     checkHealth();
@@ -41,24 +54,24 @@ const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url }) => {
       // clearInterval(deployInterval);
     };
   }, []);
-
   return (
     <>
-      <div className="flex flex-col gap-3 p-2 bg-white text-black border rounded-lg shadow-sm">
-        <div>
-          <strong>{site_name}</strong>
-        </div>
-        <div>
-          <Link href={site_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-            {site_url}
-          </Link>
-        </div>
-        <div className={`font-bold ${status === 'Online' ? 'text-green-600' : 'text-red-600'}`}>
+      <div className={`font-bold flex flex-row items-center gap-2 ${status === 'Online' ? 'text-green-600' : (status === 'Offline' ? 'text-red-600' : 'text-grey-600')}`}>
+          { status === "Offline" &&
+            <OfflineIcon/>
+          }
+          {
+            status === "Online" && 
+            <OnlineIcon/>
+          }
+          {
+            status === "Checking..." && 
+            <LoaderIcon/>
+          }
           {status}
-        </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 export default SiteCard;
