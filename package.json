@@ -1,6 +1,7 @@
 {
   "name": "bigeye",
   "version": "0.1.0",
+  "node": ">=14.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
