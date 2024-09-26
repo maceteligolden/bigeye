@@ -6,12 +6,11 @@ import React, { useState, useEffect } from 'react';
 interface SiteCardProps {
   site_name: string;
   site_url: string;
-  pipeline_name: string; // New prop for pipeline name
+  pipeline_name?: string; // New prop for pipeline name
 }
 
-const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url, pipeline_name }) => {
+const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url }) => {
   const [status, setStatus] = useState('Checking...');
-  const [deployStatus, setDeployStatus] = useState('Not Deploying'); // State for deployment status
 
   // Function to check the health of the server
   const checkHealth = async () => {
@@ -28,18 +27,6 @@ const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url, pipeline_name 
   };
 
   // Function to check the pipeline status
-  const checkPipelineStatus = async () => {
-    try {
-      const response = await fetch(`/api/pipeline?pipelineName=${pipeline_name}`);
-      const data = await response.json();
-
-      // Check if any stage is in progress
-      const isDeploying = data.stages.some((stage: any) => stage.status === 'InProgress');
-      setDeployStatus(isDeploying ? 'Deploying...' : 'Not Deploying');
-    } catch (error) {
-      setDeployStatus('Error Checking');
-    }
-  };
 
   // useEffect to check health and deployment status
   useEffect(() => {
@@ -68,9 +55,6 @@ const SiteCard: React.FC<SiteCardProps> = ({ site_name, site_url, pipeline_name 
         </div>
         <div className={`font-bold ${status === 'Online' ? 'text-green-600' : 'text-red-600'}`}>
           {status}
-        </div>
-        <div className={`font-bold ${deployStatus === 'Deploying...' ? 'text-yellow-600' : 'text-gray-600'}`}>
-          {deployStatus}
         </div>
       </div>
     </>
