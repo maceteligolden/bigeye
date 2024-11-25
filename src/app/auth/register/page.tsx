@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,7 @@ export default function Register() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: unknown) => {
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",

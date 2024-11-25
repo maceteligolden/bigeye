@@ -1,6 +1,5 @@
 import { dbConnect } from '@/facades/mongoose.facade';
 import { NextResponse } from 'next/server';
-import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
   try {
@@ -27,10 +26,8 @@ export async function POST(req: Request) {
     const newUser = { firstname, lastname, email, password };
     await collection.insertOne(newUser);
 
-    console.log('success'); // Log success message
     return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
-  } catch (error: any) {
-    console.error('Error in registration route:', error);
-    return NextResponse.json({ message: error.toString() }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ message: "Internal Server error" }, { status: 500 });
   }
 }

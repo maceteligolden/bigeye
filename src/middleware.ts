@@ -3,8 +3,8 @@ import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "yourAccessTokenSecret";
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "yourRefreshTokenSecret";
-const BASE_URL = "http://localhost:3000/";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function middleware(req: Request) {
   const accessToken = cookies().get("accessToken")?.value;

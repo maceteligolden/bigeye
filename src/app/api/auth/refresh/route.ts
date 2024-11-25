@@ -6,7 +6,7 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "yourRefreshTok
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "yourAccessTokenSecret";
 const ACCESS_TOKEN_EXPIRY = "15m"; // 15 minutes
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
      // Access cookies using the cookies() function
      const cookieStore = cookies();
