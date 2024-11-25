@@ -14,7 +14,7 @@ export async function middleware(req: Request) {
   //   return NextResponse.redirect(new URL("/auth/login", req.url));
   // }
 
-  if(accessToken && (req.url === BASE_URL || req.url === `${BASE_URL}auth/login`)){
+  if(accessToken && (req.url === BASE_URL)){
     return NextResponse.redirect(new URL("/app", req.url))
   }
 
