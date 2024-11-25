@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "yourAccessTokenSecret";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "yourRefreshTokenSecret";
+const BASE_URL = "http://localhost:3000/";
 
 export async function middleware(req: Request) {
-    if (url.startsWith(`${process.env.NEXT_PUBLIC_BASE_URL}/app`)) {
-  const accessToken = req.headers.get("authorization")?.replace("Bearer ", "");
+  const accessToken = cookies().get("accessToken")?.value;
   const refreshToken = cookies().get("refreshToken")?.value;
-  console.error("Error refreshing token:", refreshToken);
+
+  // if(!refreshToken && !accessToken) {
+  //   return NextResponse.redirect(new URL("/auth/login", req.url));
+  // }
+
+  if(accessToken && (req.url === BASE_URL || req.url === `${BASE_URL}auth/login`)){
+    return NextResponse.redirect(new URL("/app", req.url))
+  }
+
   // Validate the access token
   if (accessToken) {
     try {
-      jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
+      const secret = new TextEncoder().encode(ACCESS_TOKEN_SECRET);
+      await jwtVerify(accessToken!, secret); 
+      if(req.url === "http://localhost:3000/auth/login"){
+        NextResponse.redirect(new URL("/app", req.url))
+      }
       return NextResponse.next();
     } catch (error) {
       console.log("Access token expired or invalid. Attempting to refresh...");
@@ -23,7 +35,7 @@ export async function middleware(req: Request) {
   // If no access token or it's invalid, attempt to refresh using refresh token
   if (refreshToken) {
     try {
-      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/refresh`, {
+      const refreshResponse = await fetch(`http://localhost:3000/api/auth/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +45,7 @@ export async function middleware(req: Request) {
 
       if (!refreshResponse.ok) {
         console.error("Failed to refresh token.");
-        return NextResponse.redirect(new URL("/login", req.url)); // Redirect to login
+        return NextResponse.redirect(new URL(`/auth/login`, req.url)); // Redirect to login
       }
 
       const { accessToken: newAccessToken } = await refreshResponse.json();
@@ -44,15 +56,15 @@ export async function middleware(req: Request) {
       return response;
     } catch (error) {
       console.error("Error refreshing token:", error);
-      return NextResponse.redirect(new URL("/login", req.url)); // Redirect to login
+      return NextResponse.redirect(new URL("/auth/login", req.url)); // Redirect to login
     }
   }
 
   // If no valid tokens, redirect to login
-  return NextResponse.redirect(new URL("/login", req.url));
-    }
+  return NextResponse.redirect(new URL("/auth/login", req.url));
 }
 
 export const config = {
-  matcher: ["/app/:path*"], // Define protected routes here
+  runtime: "nodejs",
+  matcher: ["/", "/app"], // Define protected routes here
 };

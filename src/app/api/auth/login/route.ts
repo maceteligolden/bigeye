@@ -14,8 +14,9 @@ export async function POST(req: Request) {
     const { email, password } = await req.json();
     // console.log("email" + email)
     // // Connect to the database
-    await dbConnect();
-  
+    const client = await dbConnect();
+    const db = client.db('bigeye');
+    const collection = db.collection('users');
 
     // // Validate input
     if (!email || !password) {
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // // Find the user
-    const user = await User.findOne({ email });
+    const user = await collection.findOne({ email });
     console.log("user: " + user);
     if (!user) {
       return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
@@ -36,10 +37,10 @@ export async function POST(req: Request) {
     }
 
     // // Generate tokens
-    const accessToken = jwt.sign({ userId: user._id, email: user.email }, "ACCESS_TOKEN_SECRET", {
+    const accessToken = jwt.sign({ userId: user._id, email: user.email }, "yourAccessTokenSecret", {
       expiresIn: "15m",
     });
-    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, "REFRESH_TOKEN_SECRET", {
+    const refreshToken = jwt.sign({ userId: user._id, email: user.email }, "yourRefreshTokenSecret", {
       expiresIn: "7d",
     });
 
@@ -49,8 +50,8 @@ export async function POST(req: Request) {
     response.cookies.set("accessToken", accessToken, { httpOnly: true, secure: true });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in registration route:', error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ message: error.toString() }, { status: 500 });
   }
 }
