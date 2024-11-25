@@ -30,7 +30,7 @@ export default function Login() {
 
       await response.json();
     
-      router.push("/");
+      router.push("/app");
     } catch (error) {
       setErrorMessage("Internal server error");
     }
