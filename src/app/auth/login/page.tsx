@@ -7,15 +7,18 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [ isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -26,6 +29,7 @@ export default function Login() {
       if (!response.ok) {
         const error = await response.json();
         setErrorMessage(error.message || 'Login failed');
+        setIsLoading(false);
         return;
       }
 
@@ -33,6 +37,7 @@ export default function Login() {
     
       router.push("/app");
     } catch (error) {
+      setIsLoading(false);
       setErrorMessage("Internal server error");
     }
   };
@@ -70,7 +75,10 @@ export default function Login() {
             </div>
             {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
       
-            <Button type="submit"  className="mt-4 w-full">Login</Button>
+            <Button type="submit"  className="mt-4 w-full" disabled={isLoading}>
+              { isLoading && <Loader2 className="animate-spin" /> }
+              Login
+            </Button>
         
           </form>
         </CardContent>

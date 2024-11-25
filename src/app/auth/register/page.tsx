@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation"; // For App Router navigation
 import { useState } from "react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function Register() {
   const {
@@ -17,9 +18,11 @@ export default function Register() {
   } = useForm();
 
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [ isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const onSubmit = async (data: unknown) => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -30,6 +33,7 @@ export default function Register() {
       });
 
       if (!response.ok) {
+        setIsLoading(false);
         const error = await response.json();
         setErrorMessage(error.message || "Registration failed");
         return;
@@ -38,6 +42,7 @@ export default function Register() {
       // Redirect on success
       router.push("/auth/login");
     } catch (error) {
+      setIsLoading(false);
       setErrorMessage("Something went wrong");
     }
   };
@@ -106,7 +111,8 @@ export default function Register() {
               </div>
             </div>
             {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
-            <Button type="submit" className="mt-4 w-full">
+            <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
+            { isLoading && <Loader2 className="animate-spin" /> }
               Register
             </Button>
           </form>
